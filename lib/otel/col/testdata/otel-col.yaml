@@ -1,0 +1,16 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: localhost:4318
+exporters:
+  kafka:
+    brokers: ["localhost:9092"]
+    logs:
+      topic: nux-logs
+      encoding: otlp_proto
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      exporters: [kafka]

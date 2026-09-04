@@ -1,0 +1,4 @@
+nux:
+  col:
+    oltp_receiver_endpoint: localhost:4444
+    kafka_exporter_brokers: ["localhost:9092"]
