@@ -10,34 +10,30 @@ func ColCmd() *cobra.Command {
 		Short:         "OpenTelemetry collector commands",
 		SilenceUsage:  true,
 		SilenceErrors: false,
-	}
-
-	colCmd.AddCommand(ColStatusCmd())
-	colCmd.AddCommand(ColStartCmd())
-	colCmd.AddCommand(ColStopCmd())
-
-	return colCmd
-}
-
-func ColStatusCmd() *cobra.Command {
-	statusCmd := &cobra.Command{
-		Use:           "status",
-		Short:         "Show OpenTelemetry collector status",
-		SilenceUsage:  true,
-		SilenceErrors: false,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pid, err := findColProc(cmd)
 			if err != nil {
 				return err
 			}
-			cmd.Printf("otel collector pid: %v\n", pid)
-			cmd.Printf("oltp receiver endpoint: %v\n", getConfig(cmd).Nux.Col.OltpReceiverEndpoint)
-			cmd.Printf("kafka exporter brokers: %v\n", getConfig(cmd).Nux.Col.KafkaExporterBrokers)
+			cfg := getCollectorConfig(cmd)
+			cmd.Printf(`otel collector pid: %v
+otlp receiver endpoints:
+  - %v/v1/logs POST
+  - %v/v1/metrics POST
+  - %v/v1/traces POST
+kafka exporter brokers: %v
+`,
+				pid,
+				cfg.OtlpReceiverEndpoint,
+				cfg.OtlpReceiverEndpoint,
+				cfg.OtlpReceiverEndpoint,
+				cfg.KafkaExporterBrokers)
 			return nil
 		},
 	}
-
-	return statusCmd
+	colCmd.AddCommand(ColStartCmd())
+	colCmd.AddCommand(ColStopCmd())
+	return colCmd
 }
 
 func ColStartCmd() *cobra.Command {
@@ -59,7 +55,6 @@ func ColStartCmd() *cobra.Command {
 			return nil
 		},
 	}
-
 	startCmd.Flags().BoolVar(&daemon, "daemon", false, "Run as background daemon (internal use)")
 	return startCmd
 }
@@ -77,6 +72,5 @@ func ColStopCmd() *cobra.Command {
 			return nil
 		},
 	}
-
 	return stopCmd
 }

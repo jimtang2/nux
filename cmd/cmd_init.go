@@ -18,7 +18,7 @@ func InitCmd() *cobra.Command {
 			if err := createDefaultConfig(cmd, args); err != nil {
 				return err
 			}
-			cmd.Println("✅ nux config initialized (~/.nux/config.yaml)")
+			cmd.Println("✅ nux initialized (configuration written to ~/.nux)")
 			return nil
 		},
 	}

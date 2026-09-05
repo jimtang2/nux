@@ -1,4 +1,3 @@
-// cmd/col_proc.go
 package main
 
 import (
@@ -12,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jimtang2/nux/lib/otel/col"
+	"github.com/jimtang2/nux/lib/collector"
 	"github.com/spf13/cobra"
 	"golang.org/x/sys/unix"
 )
@@ -120,9 +119,9 @@ func startColProc(cmd *cobra.Command) (int, error) {
 // runCollectorDaemon is intended to be called when running in daemon mode.
 // It writes the PID file, runs the collector, and cleans up on exit.
 func runCollectorDaemon(cmd *cobra.Command) error {
-	cfg := getConfig(cmd)
-	if cfg == nil {
-		return fmt.Errorf("config not loaded")
+	cfg := getCollectorConfig(cmd)
+	if cfg.IsEmpty() {
+		return fmt.Errorf("collector config empty")
 	}
 
 	// Write PID file for this daemon process
@@ -136,7 +135,7 @@ func runCollectorDaemon(cmd *cobra.Command) error {
 		os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	c, err := col.NewCollector(cfg)
+	c, err := collector.NewCollector(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create collector: %w", err)
 	}
