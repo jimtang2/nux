@@ -1,76 +1,98 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
+
 	"github.com/spf13/cobra"
 )
 
 func ColCmd() *cobra.Command {
+	var config string
+
 	colCmd := &cobra.Command{
 		Use:           "col",
-		Short:         "OpenTelemetry collector commands",
+		Short:         "Start Otel Collector",
 		SilenceUsage:  true,
 		SilenceErrors: false,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pid, err := findColProc(cmd)
-			if err != nil {
+			// If user did not override config, use resolved default
+			if !cmd.Flags().Changed("config") {
+				defaultPath, err := defaultConfigPath()
+				if err != nil {
+					return err
+				}
+				config = defaultPath
+			}
+			if _, err := os.Stat(config); err != nil {
+				return fmt.Errorf("collector config not found at %s: %w", config, err)
+			}
+			if err := validateOtelcolConfig(config); err != nil {
 				return err
 			}
-			cfg := getCollectorConfig(cmd)
-			cmd.Printf(`otel collector pid: %v
-otlp receiver endpoints:
-  - %v/v1/logs POST
-  - %v/v1/metrics POST
-  - %v/v1/traces POST
-kafka exporter brokers: %v
-`,
-				pid,
-				cfg.OtlpReceiverEndpoint,
-				cfg.OtlpReceiverEndpoint,
-				cfg.OtlpReceiverEndpoint,
-				cfg.KafkaExporterBrokers)
+			if err := runOtelcol(config); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
-	colCmd.AddCommand(ColStartCmd())
-	colCmd.AddCommand(ColStopCmd())
+
+	defaultPath, _ := defaultConfigPath()
+	colCmd.Flags().StringVarP(&config, "config", "c", defaultPath, "otelcol config path")
+
 	return colCmd
 }
 
-func ColStartCmd() *cobra.Command {
-	var daemon bool
-
-	startCmd := &cobra.Command{
-		Use:          "start",
-		Short:        "Start the OpenTelemetry collector service",
-		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if daemon {
-				return runCollectorDaemon(cmd)
-			}
-			pid, err := startColProc(cmd)
-			if err != nil {
-				return err
-			}
-			cmd.Printf("otel collector pid: %v\n", pid)
-			return nil
-		},
+func defaultConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home dir: %w", err)
 	}
-	startCmd.Flags().BoolVar(&daemon, "daemon", false, "Run as background daemon (internal use)")
-	return startCmd
+	return filepath.Join(home, ".nux", "otelcol-config.yaml"), nil
 }
 
-func ColStopCmd() *cobra.Command {
-	stopCmd := &cobra.Command{
-		Use:          "stop",
-		Short:        "Stop the OpenTelemetry collector service",
-		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := stopColProc(cmd); err != nil {
-				return err
-			}
-			cmd.Println("otel collector pid: -1 (closed)")
-			return nil
-		},
+func validateOtelcolConfig(configPath string) error {
+	otelcolPath, err := exec.LookPath("otelcol")
+	if err != nil {
+		return fmt.Errorf("otelcol not found on PATH: %w", err)
 	}
-	return stopCmd
+
+	cmd := exec.Command(otelcolPath, "validate", "--config", configPath)
+	cmd.Stdin = nil
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("otelcol validate failed with exit code %d: %w", exitErr.ExitCode(), err)
+		}
+		return fmt.Errorf("otelcol validate failed: %w", err)
+	}
+
+	return nil
+}
+
+func runOtelcol(configPath string) error {
+	otelcolPath, err := exec.LookPath("otelcol")
+	if err != nil {
+		return fmt.Errorf("otelcol not found on PATH: %w", err)
+	}
+
+	cmd := exec.Command(otelcolPath, "--config", configPath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{}
+
+	if err := cmd.Run(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("otelcol exited with code %d: %w", exitErr.ExitCode(), err)
+		}
+		return fmt.Errorf("otelcol failed: %w", err)
+	}
+
+	return nil
 }
