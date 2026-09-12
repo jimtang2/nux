@@ -1,0 +1,26 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: localhost:4318
+exporters:
+  kafka:
+    brokers: [localhost:9092]
+    logs:
+      topic: nux-logs-test-1
+      encoding: otlp_proto
+    auth:
+      sasl:
+        username: user1
+        password: GjLy8ctKry
+        mechanism: PLAIN
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs/stdout:
+      receivers: [otlp]
+      exporters: [debug]
+    logs/kafka:
+      receivers: [otlp]
+      exporters: [kafka]

@@ -1,0 +1,262 @@
+# generator-config.yaml
+endpoint: http://localhost:4488
+
+resource:
+  service_name: nux-generator
+  deployment_env: dev
+  attributes:
+    region: eu-west-1
+
+scope:
+  name: nux-generator
+  version: "0.1.0"
+
+events:
+  - name: view_market
+    frequency: 60
+    severity: 9
+    severity_text: INFO
+    body:
+      function: view_market_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+      - function: rand_country
+        args: ["user.country"]
+      - function: rand_http_context
+
+  - name: place_spot_order
+    frequency: 20
+    severity: 9
+    severity_text: INFO
+    body:
+      function: place_spot_order_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+      - function: rand_http_context
+
+  - name: cancel_spot_order
+    frequency: 5
+    severity: 9
+    severity_text: INFO
+    body:
+      function: cancel_spot_order_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: place_futures_order
+    frequency: 10
+    severity: 9
+    severity_text: INFO
+    body:
+      function: place_futures_order_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+      - function: rand_http_context
+
+  - name: margin_borrow
+    frequency: 3
+    severity: 9
+    severity_text: INFO
+    body:
+      function: margin_borrow_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: api_request
+    frequency: 100
+    severity: 9
+    severity_text: INFO
+    body:
+      function: api_request_body
+    attributes:
+      - function: rand_user
+      - function: const
+        args: ["device.type", "api"]
+      - function: uuid
+        args: ["session.id"]
+      - function: rand_http_full
+
+  - name: login
+    frequency: 15
+    severity: 9
+    severity_text: INFO
+    body:
+      function: login_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+      - function: rand_country
+        args: ["user.country"]
+
+  - name: logout
+    frequency: 12
+    severity: 9
+    severity_text: INFO
+    body:
+      function: logout_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: deposit_crypto
+    frequency: 3
+    severity: 9
+    severity_text: INFO
+    body:
+      function: deposit_crypto_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: withdraw_crypto
+    frequency: 3
+    severity: 9
+    severity_text: INFO
+    body:
+      function: withdraw_crypto_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: deposit_fiat
+    frequency: 2
+    severity: 9
+    severity_text: INFO
+    body:
+      function: deposit_fiat_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: p2p_trade
+    frequency: 2
+    severity: 9
+    severity_text: INFO
+    body:
+      function: p2p_trade_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: view_portfolio
+    frequency: 20
+    severity: 9
+    severity_text: INFO
+    body:
+      function: view_portfolio_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: change_2fa
+    frequency: 1
+    severity: 9
+    severity_text: INFO
+    body:
+      function: change_2fa_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: change_leverage
+    frequency: 2
+    severity: 9
+    severity_text: INFO
+    body:
+      function: change_leverage_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: margin_repay
+    frequency: 3
+    severity: 9
+    severity_text: INFO
+    body:
+      function: margin_repay_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: convert_assets
+    frequency: 8
+    severity: 9
+    severity_text: INFO
+    body:
+      function: convert_assets_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: stake_subscribe
+    frequency: 4
+    severity: 9
+    severity_text: INFO
+    body:
+      function: stake_subscribe_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: stake_redeem
+    frequency: 2
+    severity: 9
+    severity_text: INFO
+    body:
+      function: stake_redeem_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]
+
+  - name: savings_subscribe
+    frequency: 4
+    severity: 9
+    severity_text: INFO
+    body:
+      function: savings_subscribe_body
+    attributes:
+      - function: rand_user
+      - function: rand_device_type
+      - function: uuid
+        args: ["session.id"]

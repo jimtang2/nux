@@ -206,3 +206,43 @@ func (c *Kafka) Close() error {
 
 	return nil
 }
+
+// ClearTopic deletes all records from the given topic by calling
+// DeleteRecords up to the latest offset on each partition.
+func (c *Kafka) ClearTopic(topic string) error {
+	if c.AdminClient == nil {
+		return fmt.Errorf("kafka admin client not initialized")
+	}
+
+	if c.Client == nil {
+		return fmt.Errorf("kafka client not initialized")
+	}
+
+	partitions, err := c.Client.Partitions(topic)
+	if err != nil {
+		return fmt.Errorf("failed to get partitions for topic %s: %w", topic, err)
+	}
+
+	if len(partitions) == 0 {
+		return fmt.Errorf("no partitions found for topic %s", topic)
+	}
+
+	for _, p := range partitions {
+		// Get the latest offset (high watermark).
+		latest, err := c.Client.GetOffset(topic, p, sarama.OffsetNewest)
+		if err != nil {
+			return fmt.Errorf("failed to get latest offset for %s:%d: %w", topic, p, err)
+		}
+
+		// Delete records up to (but not including) the latest offset.
+		partitionOffsets := map[int32]int64{
+			p: latest,
+		}
+
+		if err := c.AdminClient.DeleteRecords(topic, partitionOffsets); err != nil {
+			return fmt.Errorf("failed to delete records for %s:%d: %w", topic, p, err)
+		}
+	}
+
+	return nil
+}
