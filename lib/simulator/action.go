@@ -90,14 +90,14 @@ type LoginAction struct{}
 func (ac LoginAction) Name() string { return "login" }
 func (ac LoginAction) Condition(pl *Player, s *Simulator) bool {
 	if onboarded := pl.StateBool("onboarded"); onboarded {
-		if loggedIn := pl.StateBool("loggedIn"); !loggedIn {
+		if loggedIn := pl.StateBool("logged_in"); !loggedIn {
 			return true
 		}
 	}
 	return false
 }
 func (ac LoginAction) Exec(pl *Player, s *Simulator) error {
-	pl.SetState("loggedIn", true)
+	pl.SetState("logged_in", true)
 	return nil
 }
 func (a LoginAction) Attributes(pl *Player, s *Simulator) map[string]any {
@@ -112,14 +112,14 @@ type LogoutAction struct{}
 func (ac LogoutAction) Name() string { return "logout" }
 func (ac LogoutAction) Condition(pl *Player, s *Simulator) bool {
 	if onboarded := pl.StateBool("onboarded"); onboarded {
-		if loggedIn := pl.StateBool("loggedIn"); loggedIn {
+		if loggedIn := pl.StateBool("logged_in"); loggedIn {
 			return true
 		}
 	}
 	return false
 }
 func (ac LogoutAction) Exec(pl *Player, s *Simulator) error {
-	pl.SetState("loggedIn", false)
+	pl.SetState("logged_in", false)
 	return nil
 }
 func (a LogoutAction) Attributes(pl *Player, s *Simulator) map[string]any {

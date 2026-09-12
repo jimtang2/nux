@@ -49,7 +49,7 @@ func readOTLPEndpointFromConfig(configPath string) (string, error) {
 	return ep, nil
 }
 
-func GenCmd() *cobra.Command {
+func CmdGen() *cobra.Command {
 	var (
 		otlpEndpoint    string
 		otlpHTTP        bool

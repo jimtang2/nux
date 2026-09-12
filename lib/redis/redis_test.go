@@ -3,7 +3,7 @@ package redis_test
 import (
 	"testing"
 
-	"github.com/jimtang2/nux/lib/client/redis"
+	"github.com/jimtang2/nux/lib/redis"
 	"github.com/spf13/viper"
 )
 

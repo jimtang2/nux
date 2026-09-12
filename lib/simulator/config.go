@@ -8,10 +8,11 @@ import (
 
 /**/
 type Config struct {
-	ActionPerTurn   int                     `yaml:"action_per_turn"`
-	TimeBetweenTurn int                     `yaml:"time_between_turn"` // in ms
-	Actions         map[string]ActionConfig `yaml:"actions"`
-	Players         PlayersConfig           `yaml:"players"`
+	ActionPerTurn        int                     `yaml:"action_per_turn"`
+	TimeBetweenTurn      int                     `yaml:"time_between_turn"` // in ms
+	OTLPReceiverEndpoint string                  `yaml:"otlp_receiver_endpoint"`
+	Actions              map[string]ActionConfig `yaml:"actions"`
+	Players              PlayersConfig           `yaml:"players"`
 }
 
 type ActionConfig struct {

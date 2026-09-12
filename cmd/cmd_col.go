@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ColCmd() *cobra.Command {
+func CmdCol() *cobra.Command {
 	var config string
 
 	colCmd := &cobra.Command{

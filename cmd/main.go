@@ -25,10 +25,15 @@ func RootCmd() *cobra.Command {
 			HiddenDefaultCmd: true,
 		},
 	}
-	rootCmd.AddCommand(InitCmd())
-	rootCmd.AddCommand(ColCmd())
-	rootCmd.AddCommand(GenCmd())
-	rootCmd.AddCommand(CmdKafka())
-
+	rootCmd.AddCommand(CmdInit())
+	rootCmd.AddCommand(CmdCol())
+	rootCmd.AddCommand(CmdGen())
+	kafkaCmd := CmdKafka()
+	kafkaTopicCmd := CmdKafkaTopic()
+	kafkaTopicCmd.AddCommand(CmdKafkaTopicDelete())
+	kafkaCmd.AddCommand(kafkaTopicCmd)
+	kafkaCmd.AddCommand(CmdKafkaClear())
+	rootCmd.AddCommand(kafkaCmd)
+	rootCmd.AddCommand(CmdSimulator())
 	return rootCmd
 }

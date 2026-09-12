@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
-	"github.com/jimtang2/nux/lib/client/kafka"
+	"github.com/jimtang2/nux/lib/kafka"
 	"github.com/jimtang2/nux/lib/otel"
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/collector/pdata/plog"

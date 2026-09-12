@@ -3,7 +3,7 @@ package pg_test
 import (
 	"testing"
 
-	"github.com/jimtang2/nux/lib/client/pg"
+	"github.com/jimtang2/nux/lib/pg"
 	"github.com/spf13/viper"
 )
 

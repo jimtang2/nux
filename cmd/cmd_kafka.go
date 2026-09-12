@@ -1,3 +1,4 @@
+// cmd_kafka.go (extended)
 package main
 
 import (
@@ -5,12 +6,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/IBM/sarama"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
+
+// --- helpers ---
 
 type otelcolConfig struct {
 	Receivers struct {
@@ -71,6 +75,21 @@ func defaultKafkaConfigPath() (string, error) {
 	}
 	return filepath.Join(home, ".nux", "otelcol-config.yaml"), nil
 }
+
+func newSaramaConfig(cfg *otelcolConfig, timeout time.Duration) *sarama.Config {
+	saramaCfg := sarama.NewConfig()
+	saramaCfg.Version = sarama.V2_8_0_0
+	saramaCfg.Net.SASL.Enable = true
+	saramaCfg.Net.SASL.User = cfg.Exporters.Kafka.Auth.SASL.Username
+	saramaCfg.Net.SASL.Password = cfg.Exporters.Kafka.Auth.SASL.Password
+	saramaCfg.Net.SASL.Mechanism = sarama.SASLMechanism(cfg.Exporters.Kafka.Auth.SASL.Mechanism)
+	saramaCfg.Net.TLS.Enable = false
+	saramaCfg.ClientID = "nux-kafka-admin"
+	saramaCfg.Admin.Timeout = timeout
+	return saramaCfg
+}
+
+// --- CmdKafka: run kcat ---
 
 func CmdKafka() *cobra.Command {
 	var (
@@ -157,9 +176,10 @@ func CmdKafka() *cobra.Command {
 	kafkaCmd.Flags().StringVar(&password, "password", "", "SASL password (default: from otelcol config)")
 	kafkaCmd.Flags().StringVar(&mechanism, "mechanism", "", "SASL mechanism (default: from otelcol config)")
 
-	kafkaCmd.AddCommand(CmdKafkaClear())
 	return kafkaCmd
 }
+
+// --- CmdKafkaClear: delete all records from the topic ---
 
 func CmdKafkaClear() *cobra.Command {
 	var (
@@ -236,7 +256,6 @@ func CmdKafkaClear() *cobra.Command {
 				return fmt.Errorf("failed to get partitions for topic %s: %w", topic, err)
 			}
 
-			// Build DeleteRecords request per partition
 			for _, p := range partitions {
 				latest, err := client.GetOffset(topic, p, sarama.OffsetNewest)
 				if err != nil {
@@ -266,4 +285,164 @@ func CmdKafkaClear() *cobra.Command {
 	clearCmd.Flags().DurationVar(&timeout, "timeout", 10*time.Second, "timeout for kafka admin operations")
 
 	return clearCmd
+}
+
+// --- CmdKafkaTopic: list all topics ---
+
+func CmdKafkaTopic() *cobra.Command {
+	var (
+		config    string
+		brokers   string
+		username  string
+		password  string
+		mechanism string
+		timeout   time.Duration
+	)
+
+	topicCmd := &cobra.Command{
+		Use:   "topic",
+		Short: "List Kafka topics",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if !cmd.Flags().Changed("config") {
+				var err error
+				config, err = defaultKafkaConfigPath()
+				if err != nil {
+					return err
+				}
+			}
+
+			if _, err := os.Stat(config); err != nil {
+				return fmt.Errorf("otelcol config not found at %s: %w", config, err)
+			}
+
+			cfg, err := loadOtelcolKafkaConfig(config)
+			if err != nil {
+				return err
+			}
+
+			if !cmd.Flags().Changed("brokers") {
+				brokers = cfg.Exporters.Kafka.Brokers[0]
+			}
+			if !cmd.Flags().Changed("username") {
+				username = cfg.Exporters.Kafka.Auth.SASL.Username
+			}
+			if !cmd.Flags().Changed("password") {
+				password = cfg.Exporters.Kafka.Auth.SASL.Password
+			}
+			if !cmd.Flags().Changed("mechanism") {
+				mechanism = cfg.Exporters.Kafka.Auth.SASL.Mechanism
+			}
+
+			saramaCfg := newSaramaConfig(cfg, timeout)
+
+			client, err := sarama.NewClient([]string{brokers}, saramaCfg)
+			if err != nil {
+				return fmt.Errorf("failed to create kafka client: %w", err)
+			}
+			defer client.Close()
+
+			topics, err := client.Topics()
+			if err != nil {
+				return fmt.Errorf("failed to list topics: %w", err)
+			}
+
+			sort.Strings(topics)
+			for _, t := range topics {
+				cmd.Println(t)
+			}
+
+			return nil
+		},
+	}
+
+	topicCmd.Flags().StringVarP(&config, "config", "c", "", "otelcol config path (default: ~/.nux/otelcol-config.yaml)")
+	topicCmd.Flags().StringVarP(&brokers, "brokers", "b", "", "Kafka brokers (default: from otelcol config)")
+	topicCmd.Flags().StringVar(&username, "username", "", "SASL username (default: from otelcol config)")
+	topicCmd.Flags().StringVar(&password, "password", "", "SASL password (default: from otelcol config)")
+	topicCmd.Flags().StringVar(&mechanism, "mechanism", "", "SASL mechanism (default: from otelcol config)")
+	topicCmd.Flags().DurationVar(&timeout, "timeout", 10*time.Second, "timeout for kafka admin operations")
+
+	return topicCmd
+}
+
+// --- CmdKafkaTopicDelete: delete a topic ---
+
+func CmdKafkaTopicDelete() *cobra.Command {
+	var (
+		config    string
+		brokers   string
+		username  string
+		password  string
+		mechanism string
+		timeout   time.Duration
+	)
+
+	deleteCmd := &cobra.Command{
+		Use:   "delete [topic]",
+		Short: "Delete a Kafka topic",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			topic := args[0]
+
+			if !cmd.Flags().Changed("config") {
+				var err error
+				config, err = defaultKafkaConfigPath()
+				if err != nil {
+					return err
+				}
+			}
+
+			if _, err := os.Stat(config); err != nil {
+				return fmt.Errorf("otelcol config not found at %s: %w", config, err)
+			}
+
+			cfg, err := loadOtelcolKafkaConfig(config)
+			if err != nil {
+				return err
+			}
+
+			if !cmd.Flags().Changed("brokers") {
+				brokers = cfg.Exporters.Kafka.Brokers[0]
+			}
+			if !cmd.Flags().Changed("username") {
+				username = cfg.Exporters.Kafka.Auth.SASL.Username
+			}
+			if !cmd.Flags().Changed("password") {
+				password = cfg.Exporters.Kafka.Auth.SASL.Password
+			}
+			if !cmd.Flags().Changed("mechanism") {
+				mechanism = cfg.Exporters.Kafka.Auth.SASL.Mechanism
+			}
+
+			saramaCfg := newSaramaConfig(cfg, timeout)
+
+			client, err := sarama.NewClient([]string{brokers}, saramaCfg)
+			if err != nil {
+				return fmt.Errorf("failed to create kafka client: %w", err)
+			}
+			defer client.Close()
+
+			admin, err := sarama.NewClusterAdminFromClient(client)
+			if err != nil {
+				return fmt.Errorf("failed to create kafka admin: %w", err)
+			}
+			defer admin.Close()
+
+			if err := admin.DeleteTopic(topic); err != nil {
+				return fmt.Errorf("failed to delete topic %s: %w", topic, err)
+			}
+
+			cmd.Printf("deleted topic %s\n", topic)
+			return nil
+		},
+	}
+
+	deleteCmd.Flags().StringVarP(&config, "config", "c", "", "otelcol config path (default: ~/.nux/otelcol-config.yaml)")
+	deleteCmd.Flags().StringVarP(&brokers, "brokers", "b", "", "Kafka brokers (default: from otelcol config)")
+	deleteCmd.Flags().StringVar(&username, "username", "", "SASL username (default: from otelcol config)")
+	deleteCmd.Flags().StringVar(&password, "password", "", "SASL password (default: from otelcol config)")
+	deleteCmd.Flags().StringVar(&mechanism, "mechanism", "", "SASL mechanism (default: from otelcol config)")
+	deleteCmd.Flags().DurationVar(&timeout, "timeout", 10*time.Second, "timeout for kafka admin operations")
+
+	return deleteCmd
 }

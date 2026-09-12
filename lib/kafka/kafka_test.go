@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jimtang2/nux/lib/client/kafka"
+	"github.com/jimtang2/nux/lib/kafka"
 	"github.com/spf13/viper"
 )
 

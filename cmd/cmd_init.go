@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func InitCmd() *cobra.Command {
+func CmdInit() *cobra.Command {
 	initCmd := &cobra.Command{
 		Use:               "init",
 		Short:             "Initialize nux configuration",

@@ -1,6 +1,7 @@
 verbose: true
 action_per_turn: 100
 time_between_turn: 50
+otlp_receiver_endpoint: http://localhost:4488/v1/logs
 
 players:
   count: 50000
@@ -10,7 +11,7 @@ players:
       state:
         user.id_prefix: "new"
         onboarded: false
-        loggedIn: false
+        logged_in: false
         cex_balance_usdt: 0
         cex_balance_btc: 0
         cex_balance_eth: 0
@@ -33,7 +34,7 @@ players:
       state:
         user.id_prefix: "inactive"
         onboarded: true
-        loggedIn: false
+        logged_in: false
         cex_balance_usdt: 300
         cex_balance_btc: 0
         cex_balance_eth: 0
@@ -56,7 +57,7 @@ players:
       state:
         user.id_prefix: "retail"
         onboarded: true
-        loggedIn: true
+        logged_in: true
         cex_balance_usdt: 1200
         cex_balance_btc: 0
         cex_balance_eth: 0
@@ -81,7 +82,7 @@ players:
       state:
         user.id_prefix: "pro"
         onboarded: true
-        loggedIn: true
+        logged_in: true
         cex_balance_usdt: 8000
         cex_balance_btc: 0.2
         cex_balance_eth: 1.5
@@ -106,7 +107,7 @@ players:
       state:
         user.id_prefix: "whale"
         onboarded: true
-        loggedIn: true
+        logged_in: true
         cex_balance_usdt: 50000
         cex_balance_btc: 2.5
         cex_balance_eth: 25

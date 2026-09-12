@@ -9,11 +9,11 @@ import (
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/jimtang2/nux/lib/simulator"
-	_ "github.com/jimtang2/nux/lib/simulator/actions/cex"
+	_ "github.com/jimtang2/nux/lib/simulator-actions/cex"
 )
 
 func TestWSHandler_Broadcast(t *testing.T) {
-	sim, err := simulator.NewSimulator("../../testdata/simulator-config.yaml")
+	sim, err := simulator.NewSimulator("../testdata/simulator-config.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jimtang2/nux/lib/simulator"
-	_ "github.com/jimtang2/nux/lib/simulator/actions/cex"
+	_ "github.com/jimtang2/nux/lib/simulator-actions/cex"
 )
 
 func TestSimulator_NextNTurn(t *testing.T) {
