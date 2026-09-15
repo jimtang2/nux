@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/jimtang2/nux/lib/otel/util"
-	"github.com/jimtang2/nux/lib/simulator"
-	_ "github.com/jimtang2/nux/lib/simulator-actions/cex"
+	"github.com/jimtang2/simulator"
+	_ "github.com/jimtang2/simulator-actions/cex"
 )
 
 func TestOtelUtil_SimulatorOtelClient(t *testing.T) {
@@ -22,7 +22,7 @@ func TestOtelUtil_SimulatorOtelClient(t *testing.T) {
 		cancel()
 	}()
 
-	out := make(chan simulator.PlayerAction)
+	out := make(chan simulator.Event)
 	errCh := make(chan error)
 	go s.Continuous(ctx, out, errCh)
 
@@ -37,10 +37,10 @@ func TestOtelUtil_SimulatorOtelClient(t *testing.T) {
 
 	for {
 		select {
-		case pa := <-out:
-			t.Log(pa)
+		case e := <-out:
+			t.Log(e)
 			// Send to OTLP collector
-			if err := otelClient.Send(ctx, pa); err != nil {
+			if err := otelClient.Send(ctx, e); err != nil {
 				t.Logf("failed to send event: %v", err)
 				// Don't fail the test on send errors; just log
 			}

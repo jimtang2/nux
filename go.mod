@@ -1,11 +1,12 @@
 module github.com/jimtang2/nux
 
-go 1.26.0
+go 1.26.8
 
 require (
 	github.com/IBM/sarama v1.60.2
-	github.com/coder/websocket v1.8.15
 	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jimtang2/simulator v0.0.0-20260915171708-67de088d0ba9
+	github.com/jimtang2/simulator-actions v0.0.0-20260915172555-e51ff4cc54a8
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.160.0
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/spf13/cobra v1.10.2
@@ -27,7 +28,6 @@ require (
 	go.opentelemetry.io/otel/log v0.22.0
 	go.opentelemetry.io/otel/sdk v1.46.0
 	go.opentelemetry.io/otel/sdk/log v0.22.0
-	go.yaml.in/yaml/v3 v3.0.5
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -199,6 +199,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 // indirect
 	golang.org/x/net v0.58.0 // indirect

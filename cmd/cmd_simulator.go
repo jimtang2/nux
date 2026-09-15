@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/jimtang2/nux/lib/otel/util"
-	"github.com/jimtang2/nux/lib/simulator"
-	_ "github.com/jimtang2/nux/lib/simulator-actions/cex"
+	"github.com/jimtang2/simulator"
+	_ "github.com/jimtang2/simulator-actions/cex"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -19,7 +19,7 @@ func defaultSimulatorConfigPath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get home dir: %w", err)
 	}
-	return filepath.Join(home, ".nux", "simulator-config.yaml"), nil
+	return filepath.Join(home, ".config/nux", "simulator-config.yaml"), nil
 }
 
 func CmdSimulator() *cobra.Command {
@@ -83,7 +83,7 @@ func CmdSimulator() *cobra.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			out := make(chan simulator.PlayerAction, 256)
+			out := make(chan simulator.Event, 256)
 			errCh := make(chan error, 1)
 
 			go sim.Continuous(ctx, out, errCh)

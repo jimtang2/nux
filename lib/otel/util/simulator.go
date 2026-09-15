@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/jimtang2/nux/lib/simulator"
+	"github.com/jimtang2/simulator"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log"
@@ -22,7 +22,7 @@ type otelClientConfig struct {
 	CollectorEndpoint string `yaml:"collector_endpoint"`
 }
 
-// OtelClient is a client that sends simulator.PlayerAction events as OTLP log records.
+// OtelClient is a client that sends simulator.Event events as OTLP log records.
 type OtelClient struct {
 	provider *sdklog.LoggerProvider
 	exporter *otlploghttp.Exporter
@@ -97,10 +97,10 @@ func NewOtelClientFromEndpoint(endpoint string) (*OtelClient, error) {
 	}, nil
 }
 
-// Send sends a simulator.PlayerAction as an OTLP log record.
-func (c *OtelClient) Send(ctx context.Context, pa simulator.PlayerAction) error {
+// Send sends a simulator.Event as an OTLP log record.
+func (c *OtelClient) Send(ctx context.Context, e simulator.Event) error {
 	// Marshal attributes to JSON for the log body
-	bodyJSON, err := json.Marshal(pa.Attributes)
+	bodyJSON, err := json.Marshal(e.Attributes)
 	if err != nil {
 		return fmt.Errorf("failed to marshal attributes: %w", err)
 	}
@@ -115,9 +115,9 @@ func (c *OtelClient) Send(ctx context.Context, pa simulator.PlayerAction) error 
 
 	// Add structured attributes
 	rec.AddAttributes(
-		attribute.String("event.name", pa.ActionName),
-		attribute.Int64("simulator.turn", pa.Turn),
-		attribute.Int("simulator.player.id", pa.PlayerID),
+		attribute.String("event.name", e.ActionName),
+		attribute.Int64("simulator.turn", e.Turn),
+		attribute.Int("user.id", e.PlayerID),
 	)
 
 	// Emit the log record

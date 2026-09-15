@@ -51,7 +51,7 @@ func defaultConfigPath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get home dir: %w", err)
 	}
-	return filepath.Join(home, ".nux", "otelcol-config.yaml"), nil
+	return filepath.Join(home, ".config/nux", "otelcol-config.yaml"), nil
 }
 
 func validateOtelcolConfig(configPath string) error {

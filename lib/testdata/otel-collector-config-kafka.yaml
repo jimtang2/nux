@@ -12,7 +12,7 @@ exporters:
     auth:
       sasl:
         username: user1
-        password: GjLy8ctKry
+        password: r7kRzpHgWJ
         mechanism: PLAIN
   debug:
     verbosity: detailed

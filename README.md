@@ -1,43 +1,44 @@
-# Enhanced User Experience -- nux
+# nux
 
-## 1. What This Is
-
-In a nutshell, nux is a framework for creating and applying rules on UI, UX, and API interactions based on user profile context.
-
-This package contains a set of tools that solve various problems in deploying effective personalized customer strategies through UI, UX, and APIs.
-
-## 2. What This Is NOT
-
-This is not a telemetry library. I recommend [OpenTelemetry](https://opentelemetry.io/) for normalized datasets.
+nux, standing for Enhanced User Experience, is a solution for enriching user profiles based on rules applied to telemetry data.
 
 
-## 3. Overview
+## nux-cli
 
-Users interact with online businesses via UI (web, mobile, desktop). In order to provide personalized experience, services 
+#### github.com/jimtang2/nux/cmd
 
-### Feedback Loop
+- `nux init`
+- `nux col`
+- `nux simulator`
+- `nux gen`
 
+## Simulator
 
+#### github.com/jimtang2/nux/lib/simulator
 
-## Architecture
+- defines a custom Discrete Event Simulator that runs by turn or continuously mode
+- defines configuration of simulation size, participant states, actions, weights
+- provides an Event channel to export to Kafka, OtelCollector, etc
 
-### 
+#### github.com/jimtang2/nux/lib/simulator-actions
 
-#### Kafka
+- defines implementations of simulator.Action interface
+- package cex defines general actions for a CEX
 
-- Stores users_events
+#### github.com/jimtang2/nux/lib/otel/util
 
-### Rules Engine 
+- defines an otel sender to send Simulator output Events to an otel collector
 
-#### Postgresql
+##### Abstractions
 
-- Stores rules, profile definitions, versions
-- Stores users_profiles
+- Simulator 
+- Config
+- Player
+- Action
+- Event
 
-#### Redis
+## Infrastructure
 
-- Stores users profiles
-
-### API 
-
-- Returns users profiles
+- Otel Collector
+- Kafka
+- PostgreSQL
