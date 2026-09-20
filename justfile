@@ -18,14 +18,8 @@ bench:
 bench-watch:
     watchexec -r -e go -- just bench
 
-run:
-    go run cmd/*
-
-run-watch:
-    air
-
 build:
-    go build -o $GOBIN/nux cmd/*
+    go build -o $GOBIN/nux cmd/nux/*
 
 build-watch:
     watchexec -r -e go -- just build
