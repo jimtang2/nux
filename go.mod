@@ -6,7 +6,7 @@ require (
 	github.com/IBM/sarama v1.60.2
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jimtang2/simulator v0.0.0-20260920103353-f17883363bc1
-	github.com/jimtang2/simulator-actions v0.0.0-20260915172555-e51ff4cc54a8
+	github.com/jimtang2/simulator-actions v0.0.0-20260920103602-66b6d3c74e6c
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.160.0
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/spf13/cobra v1.10.2

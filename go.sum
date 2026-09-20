@@ -128,8 +128,8 @@ github.com/jcmturner/rpc/v2 v2.0.3 h1:7FXXj8Ti1IaVFpSAziCZWNzbNuZmnvw/i6CqLNdWfZ
 github.com/jcmturner/rpc/v2 v2.0.3/go.mod h1:VUJYCIDm3PVOEHw8sgt091/20OJjskO/YJki3ELg/Hc=
 github.com/jimtang2/simulator v0.0.0-20260920103353-f17883363bc1 h1:CCKnduRDz1XVrZ905e+yLVgCsZewLEByheesWpQVeFo=
 github.com/jimtang2/simulator v0.0.0-20260920103353-f17883363bc1/go.mod h1:svFNZ7vr3+lK3DvK9OVFNIVWQ5rEEgzE0Mrxw8ZQt/g=
-github.com/jimtang2/simulator-actions v0.0.0-20260915172555-e51ff4cc54a8 h1:OYK2h6dUFm3Ud9BKd/Y3KehyVLdFtzcVpdJb/9WBNpE=
-github.com/jimtang2/simulator-actions v0.0.0-20260915172555-e51ff4cc54a8/go.mod h1:DE9e7UDJrqDm3y/06T8VJCPZOPZUP7y/hSYnGETN380=
+github.com/jimtang2/simulator-actions v0.0.0-20260920103602-66b6d3c74e6c h1:44ZWhlqon7YTsCCzQzd2gPgB2j4VUdB+xr2IHD96CZ0=
+github.com/jimtang2/simulator-actions v0.0.0-20260920103602-66b6d3c74e6c/go.mod h1:DE9e7UDJrqDm3y/06T8VJCPZOPZUP7y/hSYnGETN380=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
